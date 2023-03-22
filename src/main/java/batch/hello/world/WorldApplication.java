@@ -22,8 +22,8 @@ public class WorldApplication {
     private StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Step step() {
-        return this.stepBuilderFactory.get("step2")
+    public Step step1() {
+        return this.stepBuilderFactory.get("step1")
                 .tasklet((contribution, chunkContext) -> {
                     System.out.println("Hello, World!");
 
@@ -33,8 +33,8 @@ public class WorldApplication {
 
     @Bean
     public Job job() {
-        return this.jobBuilderFactory.get("job")
-                .start(step()).build();
+        return this.jobBuilderFactory.get("basicJob")
+                .start(step1()).build();
     }
 
     public static void main(String[] args) {
