@@ -23,7 +23,7 @@
     1. 테스트 코드 런처 -> 실행자 (Executor)가 CLI가 아닌 경우 (ex: 테스트 코드 런처) 에선 재현이 안됩니다.
     2-01. public class RandomDecider implements JobExecutionDecider {
     2-02. public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
-    3. 
+    3. ApplicationRunner
 
 #### .etc
     

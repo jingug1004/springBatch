@@ -13,7 +13,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -29,8 +28,11 @@ dependencies {
     compileClasspath group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation 'junit:junit:4.13.1'
 
+    /* spring batch */
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
 
-    /** dev tools*/
+    /* dev tools*/
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
