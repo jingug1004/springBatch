@@ -1,6 +1,6 @@
 package batch.hello.world.transaction.dao;
 
-import batch.hello.world.transaction.domain.Transaction;
+import batch.hello.world.transaction.domain.TransactionVo;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -13,7 +13,7 @@ public class TransactionDaoImpl extends JdbcTemplate implements TransactionDao {
     }
 
     @Override
-    public List<Transaction> getTransactionsByAccountNumber(String accountNumber) {
+    public List<TransactionVo> getTransactionsByAccountNumber(String accountNumber) {
         return query(
                 "select t.id, t.timestamp, t.amount " +
                         "from transaction t inner join account_summary a on " +
@@ -21,7 +21,7 @@ public class TransactionDaoImpl extends JdbcTemplate implements TransactionDao {
                         "where a.account_number = ?",
                 new Object[]{accountNumber},
                 (rs, rowNum) -> {
-                    Transaction trans = new Transaction();
+                    TransactionVo trans = new TransactionVo();
                     trans.setAmount(rs.getDouble("amount"));
                     trans.setTimestamp(rs.getDate("timestamp"));
                     return trans;

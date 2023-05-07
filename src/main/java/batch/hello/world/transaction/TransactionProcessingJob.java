@@ -3,8 +3,8 @@ package batch.hello.world.transaction;
 import batch.hello.world.transaction.batch.TransactionApplierProcessor;
 import batch.hello.world.transaction.dao.TransactionDao;
 import batch.hello.world.transaction.dao.TransactionDaoImpl;
-import batch.hello.world.transaction.domain.AccountSummary;
-import batch.hello.world.transaction.domain.Transaction;
+import batch.hello.world.transaction.domain.AccountSummaryVo;
+import batch.hello.world.transaction.domain.TransactionVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -65,8 +65,8 @@ public class TransactionProcessingJob {
     }
 
     @Bean
-    public JdbcBatchItemWriter<Transaction> transactionWriter(DataSource dataSource) {
-        return new JdbcBatchItemWriterBuilder<Transaction>()
+    public JdbcBatchItemWriter<TransactionVo> transactionWriter(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<TransactionVo>()
                 .itemSqlParameterSourceProvider(
                         new BeanPropertyItemSqlParameterSourceProvider<>())
                 .sql("INSERT INTO TRANSACTION " +
@@ -81,7 +81,7 @@ public class TransactionProcessingJob {
     @Bean
     public Step importTransactionFileStep() {
         return this.stepBuilderFactory.get("importTransactionFileStep")
-                .<Transaction, Transaction>chunk(100)
+                .<TransactionVo, TransactionVo>chunk(100)
                 .reader(transactionReader())
                 .writer(transactionWriter(null))
                 .allowStartIfComplete(true)
@@ -91,8 +91,8 @@ public class TransactionProcessingJob {
 
     @Bean
     @StepScope
-    public JdbcCursorItemReader<AccountSummary> accountSummaryReader(DataSource dataSource) {
-        return new JdbcCursorItemReaderBuilder<AccountSummary>()
+    public JdbcCursorItemReader<AccountSummaryVo> accountSummaryReader(DataSource dataSource) {
+        return new JdbcCursorItemReaderBuilder<AccountSummaryVo>()
                 .name("accountSummaryReader")
                 .dataSource(dataSource)
                 .sql("SELECT ACCOUNT_NUMBER, CURRENT_BALANCE " +
@@ -102,7 +102,7 @@ public class TransactionProcessingJob {
                         "	FROM TRANSACTION T) " +
                         "ORDER BY A.ACCOUNT_NUMBER")
                 .rowMapper((resultSet, rowNumber) -> {
-                    AccountSummary summary = new AccountSummary();
+                    AccountSummaryVo summary = new AccountSummaryVo();
 
                     summary.setAccountNumber(resultSet.getString("account_number"));
                     summary.setCurrentBalance(resultSet.getDouble("current_balance"));
@@ -122,8 +122,8 @@ public class TransactionProcessingJob {
     }
 
     @Bean
-    public JdbcBatchItemWriter<AccountSummary> accountSummaryWriter(DataSource dataSource) {
-        return new JdbcBatchItemWriterBuilder<AccountSummary>()
+    public JdbcBatchItemWriter<AccountSummaryVo> accountSummaryWriter(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<AccountSummaryVo>()
                 .dataSource(dataSource)
                 .itemSqlParameterSourceProvider(
                         new BeanPropertyItemSqlParameterSourceProvider<>())
@@ -136,7 +136,7 @@ public class TransactionProcessingJob {
     @Bean
     public Step applyTransactionsStep() {
         return this.stepBuilderFactory.get("applyTransactionsStep")
-                .<AccountSummary, AccountSummary>chunk(100)
+                .<AccountSummaryVo, AccountSummaryVo>chunk(100)
                 .reader(accountSummaryReader(null))
                 .processor(transactionApplierProcessor())
                 .writer(accountSummaryWriter(null))
@@ -145,18 +145,18 @@ public class TransactionProcessingJob {
 
     @Bean
     @StepScope
-    public FlatFileItemWriter<AccountSummary> accountSummaryFileWriter(
+    public FlatFileItemWriter<AccountSummaryVo> accountSummaryFileWriter(
             @Value("#{jobParameters['summaryFile']}") Resource summaryFile) {
 
-        DelimitedLineAggregator<AccountSummary> lineAggregator =
+        DelimitedLineAggregator<AccountSummaryVo> lineAggregator =
                 new DelimitedLineAggregator<>();
-        BeanWrapperFieldExtractor<AccountSummary> fieldExtractor =
+        BeanWrapperFieldExtractor<AccountSummaryVo> fieldExtractor =
                 new BeanWrapperFieldExtractor<>();
         fieldExtractor.setNames(new String[]{"accountNumber", "currentBalance"});
         fieldExtractor.afterPropertiesSet();
         lineAggregator.setFieldExtractor(fieldExtractor);
 
-        return new FlatFileItemWriterBuilder<AccountSummary>()
+        return new FlatFileItemWriterBuilder<AccountSummaryVo>()
                 .name("accountSummaryFileWriter")
                 .resource(summaryFile)
                 .lineAggregator(lineAggregator)
@@ -166,7 +166,7 @@ public class TransactionProcessingJob {
     @Bean
     public Step generateAccountSummaryStep() {
         return this.stepBuilderFactory.get("generateAccountSummaryStep")
-                .<AccountSummary, AccountSummary>chunk(100)
+                .<AccountSummaryVo, AccountSummaryVo>chunk(100)
                 .reader(accountSummaryReader(null))
                 .writer(accountSummaryFileWriter(null))
                 .build();

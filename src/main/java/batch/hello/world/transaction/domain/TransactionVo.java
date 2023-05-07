@@ -11,7 +11,7 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transaction {
+public class TransactionVo {
 
     private String accountNumber;
 

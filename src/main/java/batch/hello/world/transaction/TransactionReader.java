@@ -1,13 +1,13 @@
 package batch.hello.world.transaction;
 
-import batch.hello.world.transaction.domain.Transaction;
+import batch.hello.world.transaction.domain.TransactionVo;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.item.*;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-public class TransactionReader implements ItemStreamReader<Transaction> {
+public class TransactionReader implements ItemStreamReader<TransactionVo> {
 
     private ItemStreamReader<FieldSet> fieldSetReader;
     private int recordCount = 0;
@@ -18,16 +18,16 @@ public class TransactionReader implements ItemStreamReader<Transaction> {
     }
 
     @Override
-    public Transaction read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public TransactionVo read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         return process(fieldSetReader.read());
     }
 
-    private Transaction process(FieldSet fieldSet) {
-        Transaction result = null;
+    private TransactionVo process(FieldSet fieldSet) {
+        TransactionVo result = null;
 
         if (fieldSet != null) {
             if (fieldSet.getFieldCount() > 1) {
-                result = new Transaction();
+                result = new TransactionVo();
                 result.setAccountNumber(fieldSet.readString(0));
                 result.setTimestamp(fieldSet.readDate(1, "yyyy-MM-DD HH:mm:ss"));
                 result.setAmount(fieldSet.readDouble(2));

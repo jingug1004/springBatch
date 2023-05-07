@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountSummary {
+public class AccountSummaryVo {
 
     private int id;
 

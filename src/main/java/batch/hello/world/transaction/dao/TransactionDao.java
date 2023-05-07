@@ -15,7 +15,7 @@ package batch.hello.world.transaction.dao;
  * limitations under the License.
  */
 
-import batch.hello.world.transaction.domain.Transaction;
+import batch.hello.world.transaction.domain.TransactionVo;
 
 import java.util.List;
 
@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface TransactionDao {
 
-    List<Transaction> getTransactionsByAccountNumber(String accountNumber);
+    List<TransactionVo> getTransactionsByAccountNumber(String accountNumber);
 }
